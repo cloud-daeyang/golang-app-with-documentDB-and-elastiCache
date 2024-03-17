@@ -1,4 +1,5 @@
 # 고랭으로 만든 DocumentDB & ElastiCache 데이터베이스 저장용 Application
+## app.go
 ```
 package main
 
@@ -119,4 +120,96 @@ func searchSong(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(songJSON)
 }
+```
+## index.html
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; }
+        input[type="text"], textarea { width: 100%; padding: 8px; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Song Manager</h1>
+        <div>
+            <h2>Save Song</h2>
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title">
+            </div>
+            <div class="form-group">
+                <label for="singer">Singer:</label>
+                <input type="text" id="singer">
+            </div>
+            <div class="form-group">
+                <label for="text">Text:</label>
+                <textarea id="text"></textarea>
+            </div>
+            <button onclick="saveSong()">Save Song</button>
+        </div>
+
+        <div>
+            <h2>Search Song</h2>
+            <div class="form-group">
+                <label for="searchTitle">Title:</label>
+                <input type="text" id="searchTitle">
+            </div>
+            <button onclick="searchSong()">Search Song</button>
+            <div id="searchResult"></div>
+        </div>
+    </div>
+
+    <script>
+        function saveSong() {
+            var title = document.getElementById('title').value;
+            var singer = document.getElementById('singer').value;
+            var text = document.getElementById('text').value;
+
+            fetch('/cd', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: title, singer: singer, text: text }),
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert('Song Saved');
+                document.getElementById('title').value = '';
+                document.getElementById('singer').value = '';
+                document.getElementById('text').value = '';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function searchSong() {
+            var title = document.getElementById('searchTitle').value;
+
+            fetch('/cd/' + title)
+            .then(response => response.json())
+            .then(data => {
+                var result = `Title: ${data.title}<br>Singer: ${data.singer}<br>Text: ${data.text}`;
+                document.getElementById('searchResult').innerHTML = result;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('searchResult').innerHTML = 'Song not found';
+            });
+        }
+    </script>
+</body>
+</html>
 ```
