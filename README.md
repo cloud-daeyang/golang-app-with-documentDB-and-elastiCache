@@ -213,3 +213,11 @@ func searchSong(w http.ResponseWriter, r *http.Request) {
 </body>
 </html>
 ```
+## needed package
+```
+go get github.com/aws/aws-sdk-go/aws
+go get github.com/aws/aws-sdk-go/aws/session
+go get github.com/aws/aws-sdk-go/service/secretsmanager
+go get github.com/go-redis/redis/v8
+go get go.mongodb.org/mongo-driver/mongo
+```
