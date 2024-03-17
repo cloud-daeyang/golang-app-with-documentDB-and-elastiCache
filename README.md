@@ -56,7 +56,10 @@ func main() {
 }
 
 func getSecrets(secretName string) Secrets {
-	sess, err := session.NewSession()
+	awsRegion := "ap-northeast-2"
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String(awsRegion),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,6 +123,7 @@ func searchSong(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(songJSON)
 }
+
 ```
 ## index.html
 ```
