@@ -48,12 +48,16 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/cd", handleSongs)
+	http.HandleFunc("/health", healthCheckHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func getSecrets(secretName string) Secrets {
-	sess, err := session.NewSession()
+	awsRegion := "ap-northeast-2"
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String(awsRegion),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -116,4 +120,11 @@ func searchSong(w http.ResponseWriter, r *http.Request) {
 	rdb.Set(ctx, title, songJSON, 0)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(songJSON)
+}
+
+func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	response := map[string]int{"status code": 200}
+	json.NewEncoder(w).Encode(response)
 }
